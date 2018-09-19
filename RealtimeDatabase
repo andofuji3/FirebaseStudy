@@ -27,3 +27,47 @@ myRef.addValueEventListener(new ValueEventListener() {
         Log.w("MIYA", "Failed to read value.", error.toException());
     }
 });
+
+#html
+//Webからも情報反映・読み込みが可能
+//sampleKey1の読み書きを行っている
+//Databaseが書き換わると、Webの表示も変わる
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Firebase Sample</title>
+  </head>
+  <body>
+    SampleKey1:
+    <input type="text" id="valueInput" placeholder="Message">
+    <input type="button" id="updateButton" value="Update"/>
+  </body>
+
+  <script src="https://www.gstatic.com/firebasejs/5.5.0/firebase.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "",
+      authDomain: "",
+      databaseURL: "",
+      projectId: "",
+      storageBucket: "",
+      messagingSenderId: ""
+    };
+    firebase.initializeApp(config);
+  </script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js">
+  </script>
+  <script>
+    var db = firebase.database();
+    var root = db.ref("/");
+    root.on("value", function(snapshot) {
+      $('#valueInput').val(snapshot.val().sampleKey1);
+    });
+    $('#updateButton').click(function(){
+      root.set({sampleKey1:$('#valueInput').val()});
+    });
+  </script>
+</html>
+

@@ -1,0 +1,48 @@
+# app/build.gradle
+dependencies {
+      :
+    implementation 'com.google.firebase:firebase-config:16.0.0' //ADD
+    implementation 'com.google.firebase:firebase-core:16.0.0'   //ADD
+      :
+}
+
+apply plugin: 'com.google.gms.google-services'  //ADD
+
+# project/build.gradle
+buildscript {
+  :
+  dependencies {
+    classpath 'com.google.gms:google-services:4.0.1'  //ADD
+  }
+  :
+}
+
+#src
+##メンバ追加
+FirebaseRemoteConfig mFirebaseRemoteConfig;
+
+##初期設定
+mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+// デベロッパーモード設定
+FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+        .setDeveloperModeEnabled(BuildConfig.DEBUG)
+        .build();
+mFirebaseRemoteConfig.setConfigSettings(configSettings);
+long cacheExpiration = TimeUnit.HOURS.toSeconds(1);
+if (mFirebaseRemoteConfig.getInfo().getConfigSettings().isDeveloperModeEnabled()) {
+    cacheExpiration = 0;
+}
+
+##Serverから設定値をFetch
+// Remote Config から値取得
+mFirebaseRemoteConfig.fetch(cacheExpiration)
+        .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    // 取得した値をアクティベート。アクティベートしないと、反映しない
+                    mFirebaseRemoteConfig.activateFetched();
+                    Log.i("MIYA", mFirebaseRemoteConfig.getString("test_param"));
+                }
+            }
+        });
